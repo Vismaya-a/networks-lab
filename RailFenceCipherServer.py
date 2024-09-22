@@ -22,15 +22,21 @@ def rail_fence_encrypt(text, key):
     return "".join(result)
 
 def handle_client(client_socket):
-    key = 3  # Set your number of rails (can be modified)
-    
     while True:
-        message = client_socket.recv(1024).decode()
-        if not message:
+        # Receive message from client
+        message_data = client_socket.recv(1024).decode()
+        if not message_data:
             break
-        print(f"Received from client: {message}")
+        
+        # The message_data is formatted as: "<message>|<key>"
+        message, key = message_data.split('|')
+        key = int(key)
+        
+        print(f"Received from client: {message} with {key} rails")
         encrypted_message = rail_fence_encrypt(message, key)
         print(f"Encrypted message: {encrypted_message}")
+        
+        # Send the encrypted message back to the client
         client_socket.send(encrypted_message.encode())
 
     client_socket.close()
